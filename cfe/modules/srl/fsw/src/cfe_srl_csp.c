@@ -35,13 +35,13 @@ int CFE_SRL_RouteInitCSP(void) {
 
     /**
      * CSP CAN Initialization
+     * @param bitrate meaningless
      */
-    InterfaceCAN = csp_can_socketcan_init(CSP_CAN_DEV_NAME, 0, false);
-    if (InterfaceCAN == NULL) {
-        CFE_ES_WriteToSysLog("%s: CSP Socket CAN Init failed! NO RC", __func__);
+    Status = csp_can_socketcan_open_and_add_interface(CSP_CAN_DEV_NAME, "CSP CAN", 1000000, false, &InterfaceCAN);
+    if (Status != CSP_ERR_NONE) {
+        CFE_ES_WriteToSysLog("%s: CSP Socket CAN Init failed! RC = %d", __func__, Status);
         return CFE_SRL_CSP_CAN_INIT_ERR;
     }
-
     /**
      * CSP I2C Initialization
      */
@@ -165,42 +165,38 @@ int CFE_SRL_TransactionCSP(uint8_t Node, uint8_t Port, void *TxData, int TxSize,
  */
 int CFE_SRL_GetRparamCSP(uint8_t Type, uint8_t Node, gs_param_table_id_t TableId, uint16_t Addr, void *Param) {
     int Status;
-    CFE_SRL_CSP_Node_Config_t *Config;
     if (Param == NULL) return CFE_SRL_BAD_ARGUMENT;
-
-    Status = CFE_SRL_GetNodeConfigCSP(Node, &Config);
-    if (Status != CFE_SUCCESS) return CFE_SRL_CSP_GET_CONFIG_ERR;
-    OS_printf("Priority: %u || Timeout: %u\n", Config->Priority, Config->Timeout);
+    
     switch(Type) {
         case GS_PARAM_UINT8:    
-            Status = gs_rparam_get_uint8(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, (uint8_t *)Param);
+            Status = gs_rparam_get_uint8(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, (uint8_t *)Param);
             break;
         case GS_PARAM_INT8:
-            Status = gs_rparam_get_int8(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, (int8_t *)Param);
+            Status = gs_rparam_get_int8(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, (int8_t *)Param);
             break;
         case GS_PARAM_UINT16:
-            Status = gs_rparam_get_uint16(Node, TableId, Addr,GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, (uint16_t *)Param);
+            Status = gs_rparam_get_uint16(Node, TableId, Addr,GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, (uint16_t *)Param);
             break;
         case GS_PARAM_INT16:
-            Status = gs_rparam_get_int16(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, (int16_t *)Param);
+            Status = gs_rparam_get_int16(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, (int16_t *)Param);
             break;
         case GS_PARAM_UINT32:
-            Status = gs_rparam_get_uint32(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, (uint32_t *)Param);
+            Status = gs_rparam_get_uint32(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, (uint32_t *)Param);
             break;
         case GS_PARAM_INT32:
-            Status = gs_rparam_get_int32(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, (int32_t *)Param);
+            Status = gs_rparam_get_int32(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, (int32_t *)Param);
             break;
         case GS_PARAM_UINT64:
-            Status = gs_rparam_get_uint64(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, (uint64_t *)Param);
+            Status = gs_rparam_get_uint64(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, (uint64_t *)Param);
             break;
         case GS_PARAM_INT64:
-            Status = gs_rparam_get_int64(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, (int64_t *)Param);
+            Status = gs_rparam_get_int64(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, (int64_t *)Param);
             break;
         case GS_PARAM_FLOAT:
-            Status = gs_rparam_get_float(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, (float *)Param);
+            Status = gs_rparam_get_float(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, (float *)Param);
             break;
         case GS_PARAM_DOUBLE:
-            Status = gs_rparam_get_double(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, (double *)Param);
+            Status = gs_rparam_get_double(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, (double *)Param);
             break;
         default:
             Status = CFE_SRL_TYPE_UNSUPPORTED;
@@ -216,41 +212,39 @@ int CFE_SRL_GetRparamCSP(uint8_t Type, uint8_t Node, gs_param_table_id_t TableId
 
 int CFE_SRL_SetRparamCSP(uint8_t Type, uint8_t Node, gs_param_table_id_t TableId, uint16_t Addr, void *Param) {
     int Status;
-    CFE_SRL_CSP_Node_Config_t *Config;
+
     if (Param == NULL) return CFE_SRL_BAD_ARGUMENT;
 
-    Status = CFE_SRL_GetNodeConfigCSP(Node, &Config);
-    if (Status != CFE_SUCCESS) return CFE_SRL_CSP_GET_CONFIG_ERR;
     switch(Type) {
         case GS_PARAM_UINT8:
-            Status = gs_rparam_set_uint8(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, *(uint8_t *)Param);
+            Status = gs_rparam_set_uint8(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, *(uint8_t *)Param);
             break;
         case GS_PARAM_INT8:
-            Status = gs_rparam_set_int8(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, *(int8_t *)Param);
+            Status = gs_rparam_set_int8(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, *(int8_t *)Param);
             break;
         case GS_PARAM_UINT16:
-            Status = gs_rparam_set_uint16(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, *(uint16_t *)Param);
+            Status = gs_rparam_set_uint16(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, *(uint16_t *)Param);
             break;
         case GS_PARAM_INT16:
-            Status = gs_rparam_set_int16(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, *(int16_t *)Param);
+            Status = gs_rparam_set_int16(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, *(int16_t *)Param);
             break;
         case GS_PARAM_UINT32:
-            Status = gs_rparam_set_uint32(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, *(uint32_t *)Param);
+            Status = gs_rparam_set_uint32(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, *(uint32_t *)Param);
             break;
         case GS_PARAM_INT32:
-            Status = gs_rparam_set_int32(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, *(int32_t *)Param);
+            Status = gs_rparam_set_int32(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, *(int32_t *)Param);
             break;
         case GS_PARAM_UINT64:
-            Status = gs_rparam_set_uint64(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, *(uint64_t *)Param);
+            Status = gs_rparam_set_uint64(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, *(uint64_t *)Param);
             break;
         case GS_PARAM_INT64:
-            Status = gs_rparam_set_int64(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, *(int64_t *)Param);
+            Status = gs_rparam_set_int64(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, *(int64_t *)Param);
             break;
         case GS_PARAM_FLOAT:
-            Status = gs_rparam_set_float(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, *(float *)Param);
+            Status = gs_rparam_set_float(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, *(float *)Param);
             break;
         case GS_PARAM_DOUBLE:
-            Status = gs_rparam_set_double(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, Config->Timeout, *(double *)Param);
+            Status = gs_rparam_set_double(Node, TableId, Addr, GS_RPARAM_MAGIC_CHECKSUM, NodeConfig[Node]->Timeout, *(double *)Param);
             break;
         default:
             Status = CFE_SRL_TYPE_UNSUPPORTED;
@@ -262,4 +256,8 @@ int CFE_SRL_SetRparamCSP(uint8_t Type, uint8_t Node, gs_param_table_id_t TableId
         return CFE_SRL_SET_RPARAM_ERR;
     }
     return CFE_SUCCESS;
+}
+
+int CFE_SRL_PingCSP(uint8 Node, uint32 Timeout, unsigned int Size, uint8 Options) {
+    return csp_ping(Node, Timeout, Size, Options);
 }
