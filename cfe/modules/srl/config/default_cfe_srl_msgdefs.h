@@ -80,6 +80,6 @@ typedef struct CFE_SRL_HousekeepingTlm_Payload {
 
     CFE_SRL_GPIO_Handle_t GPIOHandle[CFE_SRL_TOT_GPIO_NUM];
     
-} CFE_SRL_HousekeepingTlm_Payload_t;
+}__attribute__((packed)) CFE_SRL_HousekeepingTlm_Payload_t;
 
 #endif /* CFE_SRL_MSGDEFS_H */

@@ -114,7 +114,9 @@
         "cfe_resourceid_api_typedefs.h": "c",
         "cfe_sb_platform_cfg.h": "c",
         "cfe_tbl_platform_cfg.h": "c",
-        "cfe_tbl_internal_cfg.h": "c"
+        "cfe_tbl_internal_cfg.h": "c",
+        "cfe_srl_dispatch.h": "c",
+        "cfe_srl_msgids.h": "c"
     },
     "cmake.sourceDirectory": "/home/hj/Documents/FSW/tools/elf2cfetbl"
 }

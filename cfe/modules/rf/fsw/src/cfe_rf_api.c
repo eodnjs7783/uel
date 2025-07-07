@@ -96,7 +96,7 @@ void CFE_RF_CommandIngestTask(void) {
                         Status = CFE_SB_TransmitMsg((CFE_MSG_Message_t *)Packet->data, false);
                         if (Status != CFE_SUCCESS) {
                             CFE_ES_WriteToSysLog("%s: Transmit message failed! RC=%d\n", __func__, Status);
-                            return;
+                            continue;
                         }
                     }
                     /* Free buffer & Remove dangled pointer */
