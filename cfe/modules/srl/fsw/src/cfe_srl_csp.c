@@ -1,17 +1,3 @@
-#include <csp/csp.h>
-#include <csp/csp_endian.h>
-#include <csp/arch/csp_thread.h>
-#include <csp/drivers/usart.h>
-#include <csp/drivers/can_socketcan.h>
-#include <csp/interfaces/csp_if_zmqhub.h>
-#include <gs/ftp/client.h>
-#include <gs/csp/csp.h>
-#include <gs/csp/router.h>
-#include <gs/param/rparam.h>
-
-#include <gs/csp/drivers/i2c/i2c.h>
-
-
 #include "cfe_srl_csp.h"
 
 const char *SatName = "COSMIC"; // Revise name according to specific misison
@@ -19,7 +5,7 @@ const char *SatName = "COSMIC"; // Revise name according to specific misison
 /**
  * Indexed by CSP Node number.
  */
-CFE_SRL_CSP_Node_Config_t *NodeConfig[32] = {0}; // Not mandatory
+CFE_SRL_CSP_Node_Config_t *NodeConfig[CFE_SRL_CSP_MAX_DEVICE_NUM] = {0,};
 
 int CFE_SRL_RouteInitCSP(void) {
     int Status;
@@ -52,17 +38,19 @@ int CFE_SRL_RouteInitCSP(void) {
      * CSP Routing Table Set
      */
     /* CAN */
-    Status = csp_rtable_set(CSP_NODE_UTRX, CSP_ID_HOST_SIZE, InterfaceCAN, CSP_NO_VIA_ADDRESS);
-    if (Status != CSP_ERR_NONE) return CFE_SRL_CSP_RTABLE_SET_ERR;
+    Status = CFE_SRL_RtableCSP(InterfaceCAN);
+    if (Status != CFE_SUCCESS) return CFE_SRL_CSP_RTABLE_SET_ERR;
+    // Status = csp_rtable_set(CSP_NODE_UTRX, CSP_ID_HOST_SIZE, InterfaceCAN, CSP_NO_VIA_ADDRESS);
+    // if (Status != CSP_ERR_NONE) return CFE_SRL_CSP_RTABLE_SET_ERR;
 
-    Status = csp_rtable_set(CSP_NODE_STRX, CSP_ID_HOST_SIZE, InterfaceCAN, CSP_NO_VIA_ADDRESS);
-    if (Status != CSP_ERR_NONE) return CFE_SRL_CSP_RTABLE_SET_ERR;
+    // Status = csp_rtable_set(CSP_NODE_STRX, CSP_ID_HOST_SIZE, InterfaceCAN, CSP_NO_VIA_ADDRESS);
+    // if (Status != CSP_ERR_NONE) return CFE_SRL_CSP_RTABLE_SET_ERR;
 
-    Status = csp_rtable_set(CSP_NODE_GS_KISS, CSP_ID_HOST_SIZE, InterfaceCAN, CSP_NODE_UTRX);
-    if (Status != CSP_ERR_NONE) return CFE_SRL_CSP_RTABLE_SET_ERR;
+    // Status = csp_rtable_set(CSP_NODE_GS_KISS, CSP_ID_HOST_SIZE, InterfaceCAN, CSP_NODE_UTRX);
+    // if (Status != CSP_ERR_NONE) return CFE_SRL_CSP_RTABLE_SET_ERR;
 
-    Status = csp_rtable_set(CSP_NODE_GSTRX, CSP_ID_HOST_SIZE, InterfaceCAN, CSP_NODE_UTRX);
-    if (Status != CSP_ERR_NONE) return CFE_SRL_CSP_RTABLE_SET_ERR;
+    // Status = csp_rtable_set(CSP_NODE_GSTRX, CSP_ID_HOST_SIZE, InterfaceCAN, CSP_NODE_UTRX);
+    // if (Status != CSP_ERR_NONE) return CFE_SRL_CSP_RTABLE_SET_ERR;
     /* I2C */
     // Status = csp_rtable_set(CSP_NODE_EPS, CSP_ID_HOST_SIZE, InterfaceI2C, CSP_NO_VIA_ADDRESS);
     // if (Status != CSP_ERR_NONE) return CFE_SRL_CSP_RTABLE_SET_ERR;
@@ -98,20 +86,23 @@ int CFE_SRL_GetNodeConfigCSP(uint8_t Node, CFE_SRL_CSP_Node_Config_t **Config) {
 int CFE_SRL_InitCSP(void) {
     int Status;
 
-    csp_conf_t CspConfig = {
-        .address            =   CSP_NODE_OBC, // Revise to Real OBC Node
-        .hostname           =   "OBC",
-        .model              =   SatName,
-        .revision           =   "mozart",
-        .conn_max           =   10, // Revise if needed. If external CSP device is too many.
-        .conn_queue_length  =   10, // Connection queue's packet number.
-        .fifo_length        =   25, // Router queue's packet number.
-        .port_max_bind      =   32,
-        .rdp_max_window     =   20,
-        .buffers            =   10,
-        .buffer_data_size   =   256,
-        .conn_dfl_so        =   CSP_O_NONE
-    };
+    // csp_conf_t CspConfig = {
+    //     .address            =   CSP_NODE_OBC, // Revise to Real OBC Node
+    //     .hostname           =   "OBC",
+    //     .model              =   SatName,
+    //     .revision           =   "mozart",
+    //     .conn_max           =   10, // Revise if needed. If external CSP device is too many.
+    //     .conn_queue_length  =   10, // Connection queue's packet number.
+    //     .fifo_length        =   25, // Router queue's packet number.
+    //     .port_max_bind      =   32,
+    //     .rdp_max_window     =   20,
+    //     .buffers            =   10,
+    //     .buffer_data_size   =   256,
+    //     .conn_dfl_so        =   CSP_O_NONE
+    // };
+    csp_conf_t CspConfig;
+    CFE_SRL_ConfigHost(&CspConfig);
+    
     Status = csp_init(&CspConfig);
     if (Status != CSP_ERR_NONE) {
         CFE_ES_WriteToSysLog("%s: csp_init failed! CSP RC=%d\n",__func__, Status);
@@ -132,12 +123,13 @@ int CFE_SRL_InitCSP(void) {
      * Register Node Configuration to each Node.
      * If Node appended(or revised), insert(or revise) the function.
      */
-    CFE_SRL_NodeConfigCSP(CSP_NODE_EPS, CSP_PRIO_NORM, CSP_TIMEOUT(1), CSP_O_CRC32);
-    CFE_SRL_NodeConfigCSP(CSP_NODE_UTRX, CSP_PRIO_NORM, CSP_TIMEOUT(1), CSP_O_CRC32);
-    CFE_SRL_NodeConfigCSP(CSP_NODE_STRX, CSP_PRIO_NORM, CSP_TIMEOUT(1), CSP_O_CRC32);
+    CFE_SRL_AllNodeConfigCSP();
+    // CFE_SRL_NodeConfigCSP(CSP_NODE_EPS, CSP_PRIO_NORM, CSP_TIMEOUT(1), CSP_O_CRC32);
+    // CFE_SRL_NodeConfigCSP(CSP_NODE_UTRX, CSP_PRIO_NORM, CSP_TIMEOUT(1), CSP_O_CRC32);
+    // CFE_SRL_NodeConfigCSP(CSP_NODE_STRX, CSP_PRIO_NORM, CSP_TIMEOUT(1), CSP_O_CRC32);
 
-    CFE_SRL_NodeConfigCSP(CSP_NODE_GS_KISS, CSP_PRIO_HIGH, CSP_TIMEOUT(3), CSP_O_CRC32);
-    CFE_SRL_NodeConfigCSP(CSP_NODE_GSTRX, CSP_PRIO_HIGH, CSP_TIMEOUT(3), CSP_O_CRC32);
+    // CFE_SRL_NodeConfigCSP(CSP_NODE_GS_KISS, CSP_PRIO_HIGH, CSP_TIMEOUT(3), CSP_O_CRC32);
+    // CFE_SRL_NodeConfigCSP(CSP_NODE_GSTRX, CSP_PRIO_HIGH, CSP_TIMEOUT(3), CSP_O_CRC32);
 
     return CFE_SUCCESS;
 }
