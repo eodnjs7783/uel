@@ -119,7 +119,8 @@
         "cfe_srl_msgids.h": "c",
         "csp_endian.h": "c",
         "csp_thread.h": "c",
-        "i2c.h": "c"
+        "i2c.h": "c",
+        "time.h": "c"
     },
     "cmake.sourceDirectory": "/home/hj/Documents/FSW/tools/elf2cfetbl"
 }
