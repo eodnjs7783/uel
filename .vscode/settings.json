@@ -120,7 +120,15 @@
         "csp_endian.h": "c",
         "csp_thread.h": "c",
         "i2c.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "sample_lib.h": "c",
+        "rpt.h": "c",
+        "cfe_sb_destination_typedef.h": "c",
+        "cfe_evs.h": "c",
+        "cfe_es.h": "c",
+        "cfe_es_api_typedefs.h": "c",
+        "sc_msg.h": "c",
+        "sc_platform_cfg.h": "c"
     },
     "cmake.sourceDirectory": "/home/hj/Documents/FSW/tools/elf2cfetbl"
 }

@@ -21,4 +21,7 @@
 #../../../../cfe/fsw/cfe-core/src/inc/cfe_evs_msg.h
 #../../../../cfe/fsw/cfe-core/src/inc/cfe_sb_msg.h
 #../../../../cfe/fsw/cfe-core/src/inc/cfe_tbl_msg.h
-
+../../../../apps/sc/config/default_sc_fcncodes.h
+../../../../apps/sc/config/default_sc_msg.h
+../../../../apps/sc/config/default_sc_msgdefs.h
+../../../../apps/sc/config/default_sc_msgstruct.h
