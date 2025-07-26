@@ -128,7 +128,15 @@
         "cfe_es.h": "c",
         "cfe_es_api_typedefs.h": "c",
         "sc_msg.h": "c",
-        "sc_platform_cfg.h": "c"
+        "sc_platform_cfg.h": "c",
+        "rpt_task.h": "c",
+        "rpt_dispatch.h": "c",
+        "rpt_msgids.h": "c",
+        "rpt_mission_cfg.h": "c",
+        "rpt_tbl.h": "c",
+        "cfe_tbl_filedef.h": "c",
+        "rpt_cmd.h": "c",
+        "rpt_eventids.h": "c"
     },
     "cmake.sourceDirectory": "/home/hj/Documents/FSW/tools/elf2cfetbl"
 }

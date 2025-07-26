@@ -10,7 +10,7 @@
 CFE_SRL_IO_Handle_t *Handles[CFE_SRL_GNRL_DEVICE_NUM];
 /**************************************************
  * Index of Each device
- * 0 : SOCAT Handle
+ * 0 : Not initializaed padding Handle
  **************************************************/
 
 CFE_SRL_GPIO_Handle_t GPIO[CFE_SRL_TOT_GPIO_NUM];
@@ -32,13 +32,5 @@ int32 CFE_SRL_EarlyInit(void) {
 	 * Serial Comm. Init
  	 * Only `ready == true` interface is initialized
 	 **************************************************/
-	/* socat Init */
-	Status = CFE_SRL_HandleInit(&Handles[CFE_SRL_SOCAT_HANDLE_INDEXER], "socat", "/dev/pts/5", SRL_DEVTYPE_UART, CFE_SRL_SOCAT_HANDLE_INDEXER, 115200, 0);
-	if (Status != CFE_SUCCESS) {
-		CFE_ES_WriteToSysLog("%s: socat Initialization failed! RC=%d\n", __func__, Status);
-		return CFE_SRL_SOCAT_INIT_ERR;
-	}
-	CFE_ES_WriteToSysLog("%s: socat Initialized. FD=%d || DevName=%s\n", __func__, Handles[CFE_SRL_SOCAT_HANDLE_INDEXER]->FD, ((CFE_SRL_Global_Handle_t *)Handles[CFE_SRL_SOCAT_HANDLE_INDEXER])->DevName);
-
 return CFE_SUCCESS;
 }

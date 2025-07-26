@@ -115,6 +115,7 @@ void SC_ProcessRequest(const CFE_SB_Buffer_t *BufPtr)
                 SC_WakeupCmd((const SC_WakeupCmd_t *)BufPtr);
             }
             break;
+        
         case LC_RTS_REQUEST_MID:
             if (SC_VerifyCmdLength(&BufPtr->Msg, sizeof(SC_StartRtsCmd_t))) {
                 uint16_t CC;
