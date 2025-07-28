@@ -21,6 +21,7 @@ typedef struct RPT_HkTlm_Payload{
     uint16 BootCount;
     uint32 TimeSec;
     uint32 TimeSubsec;
+    uint32 Sequence; /* Backup data numbering */
 
 } RPT_HkTlm_Payload_t;
 

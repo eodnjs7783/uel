@@ -18,9 +18,9 @@
 
 RPT_Table_t RPT_Subs[RPT_MAX_TBL_ENTRY] = {
     /* Entry 0 */
-    {.UsedState = RPT_DISABLED,
-        .Entry.MessageID = CFE_SB_MSGID_RESERVED,
-        .Entry.IsCritical = RPT_NOT_CRITICAL},
+    {.UsedState = RPT_ENABLED,
+        .Entry.MessageID = CFE_SB_MSGID_WRAP_VALUE(0x0823),
+        .Entry.IsCritical = RPT_CRITICAL},
 
     /* Entry 1 */
     {.UsedState = RPT_DISABLED,

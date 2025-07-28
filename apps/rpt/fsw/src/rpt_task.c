@@ -349,9 +349,23 @@ CFE_Status_t RPT_Init(void) {
                             "RPT Operation data init failed. RC = %d", Status);
     }
 
-    CFE_EVS_SendEvent(RPT_INIT_INF_EID, CFE_EVS_EventType_INFORMATION,
-                            "RPT Initialization success.");
+    /********************************
+     * 
+     * Critical Data Init
+     * 
+     *******************************/
+    if (Status == CFE_SUCCESS) {
+        Status = RPT_CriticalQInit();
+        if (Status != CFE_SUCCESS) {
+            CFE_EVS_SendEvent(RPT_CRIT_INIT_ERR_EID, CFE_EVS_EventType_ERROR,
+                            "RPT Critical data init failed. RC = %d", Status);
+        }
+    }
 
+    if (Status == CFE_SUCCESS) {
+        CFE_EVS_SendEvent(RPT_INIT_INF_EID, CFE_EVS_EventType_INFORMATION,
+                            "RPT Initialization success.");
+    }
 
     return Status;
 }
@@ -359,26 +373,79 @@ CFE_Status_t RPT_Init(void) {
 CFE_Status_t RPT_OpsDataInit(void) {
     CFE_Status_t Status;
     
-    RPT_Data.OpsDataHandle = RPT_OpenOpsFile();
+    RPT_Data.OpsDataHandle = RPT_OpenOpsFile(false);
     if (RPT_Data.OpsDataHandle == -1) {
         OS_printf("RPT Ops Open failed.\n");
     }
 
-    Status = RPT_ReadOpsFromFile(RPT_Data.OpsDataHandle, &RPT_Data.OpsData, sizeof(RPT_OperationData_t));
+    Status = RPT_ReadFromFile(RPT_Data.OpsDataHandle, &RPT_Data.OpsData, sizeof(RPT_OperationData_t));
     if (Status < 0) {
         OS_printf("RPT Ops Read Error.\n");
     }
-    else if (Status == sizeof(RPT_OperationData_t)) Status = CFE_SUCCESS;
+    else if (RPT_Data.OpsData.BootCount == 0 || Status == 0) Status = CFE_SUCCESS;
+    else if (RPT_Data.OpsData.BootCount != 0 || Status == sizeof(RPT_OperationData_t)) Status = CFE_SUCCESS;
+    else Status = -1; // Revise
 
-    /**
-     * If successfully read ops data, then increase boot count.
-     */
-    RPT_Data.OpsData.BootCount ++;
-    OS_printf("Boot Count: %u\n", RPT_Data.OpsData.BootCount);
+    
+    if (Status == CFE_SUCCESS) {
+        /**
+         * CRC Check
+         */
+        uint32 CRC = RPT_CalculateCRC(&RPT_Data.OpsData, (sizeof(RPT_OperationData_t) - sizeof(uint32_t)));
+        if (RPT_Data.OpsData.CRC == CRC) {
+            OS_printf("Ops CRC well matched.\n");
+            Status = CFE_SUCCESS;
+        }
+        else Status = -1; // Revise
+    }
 
-    Status = RPT_WriteOpsToFile(RPT_Data.OpsDataHandle, &RPT_Data.OpsData, sizeof(RPT_OperationData_t));
-    if (Status != CFE_SUCCESS) {
-        OS_printf("RPT Ops write error.\n");
+    if (Status == CFE_SUCCESS) {
+        /**
+         * If successfully read ops data, then increase the boot count.
+         */
+        RPT_Data.OpsData.BootCount ++;
+        OS_printf("Boot Count: %u\n", RPT_Data.OpsData.BootCount);
+        
+        RPT_Data.OpsData.CRC = RPT_CalculateCRC(&RPT_Data.OpsData, (sizeof(RPT_OperationData_t) - sizeof(uint32_t)));
+        Status = RPT_WriteToFile(RPT_Data.OpsDataHandle, &RPT_Data.OpsData, sizeof(RPT_OperationData_t));
+        if (Status != CFE_SUCCESS) {
+            OS_printf("RPT Ops write error.\n");
+            Status = -1;
+        }
+    }
+
+    return Status;
+}
+
+CFE_Status_t RPT_CriticalQInit(void) {
+    CFE_Status_t Status;
+
+    RPT_Data.CritDataHandle = RPT_OpenCriticalFile();
+    if (RPT_Data.CritDataHandle == -1) {
+        OS_printf("RPT Critical Open failed.\n");
+    }
+
+    Status = RPT_ReadFromFile(RPT_Data.CritDataHandle, &RPT_Data.CritQueue, sizeof(RPT_CriticalQueue_t));
+    if (Status < 0) {
+        OS_printf("RPT critical Read fail.\n");
+    }
+    else if (RPT_Data.OpsData.BootCount == 0 || Status == 0) Status = CFE_SUCCESS;
+    else if (RPT_Data.OpsData.BootCount != 0 || Status == sizeof(RPT_CriticalQueue_t)) Status = CFE_SUCCESS;
+
+    if (Status == CFE_SUCCESS) {
+        /**
+         * CRC Check
+         */
+        uint32 CRC = RPT_CalculateCRC(&RPT_Data.CritQueue, (sizeof(RPT_CriticalQueue_t) - sizeof(uint32_t)));
+        if (RPT_Data.CritQueue.CRC == CRC) {
+            OS_printf("Critical CRC well matched.\n");
+            Status = CFE_SUCCESS;
+        }
+        else {
+            OS_printf("Critical CRC not matched. Clear Critical Queue.\n");
+            memset(&RPT_Data.CritQueue, 0, sizeof(RPT_CriticalQueue_t));
+            Status = CFE_SUCCESS;
+        }
     }
 
     return Status;

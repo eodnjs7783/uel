@@ -93,19 +93,21 @@ int CFE_SRL_TransactionI2C(CFE_SRL_IO_Handle_t *Handle, const void *TxData, size
     struct i2c_rdwr_ioctl_data Packet = {0,};
     struct i2c_msg MsgI2C[2] = {0,};
 
-    // First Message - Write
-    MsgI2C[0].addr = (uint16_t)Addr;
-    MsgI2C[0].flags = 0;    // Write flag
-    MsgI2C[0].len = TxSize;
-    MsgI2C[0].buf = (uint8_t *)TxData;
+    if (TxData != NULL && TxSize > 0) {
+        // First Message - Write
+        MsgI2C[Packet.nmsgs].addr = (uint16_t)Addr;
+        MsgI2C[Packet.nmsgs].flags = 0;    // Write flag
+        MsgI2C[Packet.nmsgs].len = TxSize;
+        MsgI2C[Packet.nmsgs].buf = (uint8_t *)TxData;
 
-    Packet.nmsgs ++;
+        Packet.nmsgs ++;
+    }
 
     // Second Message - Read
-    MsgI2C[1].addr = (uint16_t)Addr;
-    MsgI2C[1].flags = I2C_M_RD; // Read flag
-    MsgI2C[1].len = RxSize;
-    MsgI2C[1].buf = RxData;
+    MsgI2C[Packet.nmsgs].addr = (uint16_t)Addr;
+    MsgI2C[Packet.nmsgs].flags = I2C_M_RD; // Read flag
+    MsgI2C[Packet.nmsgs].len = RxSize;
+    MsgI2C[Packet.nmsgs].buf = RxData;
 
     Packet.nmsgs ++;
     

@@ -21,7 +21,11 @@
 #../../../../cfe/fsw/cfe-core/src/inc/cfe_evs_msg.h
 #../../../../cfe/fsw/cfe-core/src/inc/cfe_sb_msg.h
 #../../../../cfe/fsw/cfe-core/src/inc/cfe_tbl_msg.h
-../../../../apps/sc/config/default_sc_fcncodes.h
-../../../../apps/sc/config/default_sc_msg.h
-../../../../apps/sc/config/default_sc_msgdefs.h
-../../../../apps/sc/config/default_sc_msgstruct.h
+#../../../../apps/sc/config/default_sc_fcncodes.h
+#../../../../apps/sc/config/default_sc_msg.h
+#../../../../apps/sc/config/default_sc_msgdefs.h
+#../../../../apps/sc/config/default_sc_msgstruct.h
+../../../../apps/rpt/config/default_rpt_fcncodes.h
+../../../../apps/rpt/config/default_rpt_msg.h
+../../../../apps/rpt/config/default_rpt_msgdefs.h
+../../../../apps/rpt/config/default_rpt_msgstruct.h

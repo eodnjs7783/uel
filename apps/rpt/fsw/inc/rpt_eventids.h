@@ -22,7 +22,8 @@
 #define RPT_REPORT_SUB_ERR_EID  12
 #define RPT_PRIOR_INIT_ERR_EID  13
 #define RPT_OPS_INIT_ERR_EID    14
-#define RPT_MUTEX_INIT_ERR_EID  15
+#define RPT_CRIT_INIT_ERR_EID   15
+#define RPT_MUTEX_INIT_ERR_EID  16
 
 
 #endif

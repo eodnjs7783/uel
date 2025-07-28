@@ -136,7 +136,10 @@
         "rpt_tbl.h": "c",
         "cfe_tbl_filedef.h": "c",
         "rpt_cmd.h": "c",
-        "rpt_eventids.h": "c"
+        "rpt_eventids.h": "c",
+        "rpt_internal_cfg.h": "c",
+        "cfe_time.h": "c",
+        "cfe_es_resetdata_typedef.h": "c"
     },
     "cmake.sourceDirectory": "/home/hj/Documents/FSW/tools/elf2cfetbl"
 }

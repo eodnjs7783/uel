@@ -407,10 +407,11 @@ int32 CFE_SRL_ReadGenericCAN(CFE_SRL_IO_Handle_t *Handle, CFE_SRL_IO_Param_t *Pa
 int32 CFE_SRL_ReadSPI(CFE_SRL_IO_Handle_t *Handle, const void *TxData, size_t TxSize, void *RxData, size_t RxSize) {
     int32 Status;
     CFE_SRL_DevType_t DevType;
+    uint8_t Idx = 0;
     struct spi_ioc_transfer Xfer[2];
     memset(Xfer, 0, sizeof(Xfer));
 
-    if (Handle == NULL || TxData == NULL || RxData == NULL) return CFE_SRL_BAD_ARGUMENT;
+    if (Handle == NULL || RxData == NULL) return CFE_SRL_BAD_ARGUMENT;
 
     DevType = CFE_SRL_GetHandleDevType(Handle);
     if (DevType != SRL_DEVTYPE_SPI) return CFE_SRL_INVALID_TYPE;
@@ -418,13 +419,19 @@ int32 CFE_SRL_ReadSPI(CFE_SRL_IO_Handle_t *Handle, const void *TxData, size_t Tx
     Status = CFE_SRL_MutexLock(Handle);
     if (Status != CFE_SUCCESS) return Status;
 
-    Xfer[0].tx_buf = (uint64_t)(uintptr_t)TxData;
-    Xfer[0].len = TxSize;
+    if (TxData != NULL && TxSize > 0) {
+        Xfer[Idx].tx_buf = (uint64_t)(uintptr_t)TxData;
+        Xfer[Idx].len = TxSize;
 
-    Xfer[1].rx_buf = (uint64_t)(uintptr_t)RxData;
-    Xfer[1].len = RxSize;
+        Idx ++;
+    }
+    
+    Xfer[Idx].rx_buf = (uint64_t)(uintptr_t)RxData;
+    Xfer[Idx].len = RxSize;
 
-    Status = ioctl(Handle->FD, SPI_IOC_MESSAGE(2), Xfer);
+    Idx ++;
+
+    Status = ioctl(Handle->FD, SPI_IOC_MESSAGE(Idx), Xfer);
     if (Status < 0) {
         Handle->__errno = errno;
         Status = CFE_SRL_IOCTL_ERR;

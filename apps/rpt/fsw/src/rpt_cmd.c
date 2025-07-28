@@ -31,6 +31,7 @@ CFE_Status_t RPT_SendBeaconCmd(void) {
     RPT_Data.HkTlm.Payload.BootCount = RPT_Data.OpsData.BootCount;
     RPT_Data.HkTlm.Payload.TimeSec = RPT_Data.OpsData.TimeSec;
     RPT_Data.HkTlm.Payload.TimeSubsec = RPT_Data.OpsData.TimeSubsec;
+    RPT_Data.HkTlm.Payload.Sequence = RPT_Data.OpsData.Sequence;
     OS_MutSemGive(RPT_Data.OpsMutexID);
 
     CFE_SB_TimeStampMsg(CFE_MSG_PTR(RPT_Data.HkTlm.TelemetryHeader));
@@ -57,7 +58,9 @@ CFE_Status_t RPT_ReportCmd(const RPT_ReportCmd_t *Msg) {
     int32 Status;
     RPT_Report_Payload_t Payload = Msg->Payload;
 
-    Status = RPT_MultipleReport(Payload.StartIdx, Payload.TotalNumber, Payload.IsCritical);
+    if (Payload.IsCritical) Status = RPT_MultipleCritical(Payload.StartIdx, Payload.TotalNumber);
+    else Status = RPT_MultipleReport(Payload.StartIdx, Payload.TotalNumber);
+    
     if (Status != CFE_SUCCESS) RPT_Data.ErrCounter ++;
 
     return CFE_SUCCESS;

@@ -141,7 +141,8 @@ int CFE_SRL_InitCSP(void) {
 int CFE_SRL_TransactionCSP(uint8_t Node, uint8_t Port, void *TxData, int TxSize, void *RxData, int RxSize) {
     // If there is no reply, Put `RxSize = 0`
     int Status;
-    if (NodeConfig[Node] == NULL || TxData == NULL || RxData == NULL) return CFE_SRL_BAD_ARGUMENT;
+    if (NodeConfig[Node] == NULL || TxData == NULL) return CFE_SRL_BAD_ARGUMENT;
+    if (RxData == NULL && RxSize != 0) return CFE_SRL_BAD_ARGUMENT;
 
     Status = csp_transaction_w_opts(NodeConfig[Node]->Priority, Node, Port, NodeConfig[Node]->Timeout, TxData, TxSize, RxData, RxSize, NodeConfig[Node]->Options);
     if (Status == 0) return CFE_SRL_TRANSACTION_ERR;

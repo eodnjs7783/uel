@@ -32,5 +32,12 @@ int32 CFE_SRL_EarlyInit(void) {
 	 * Serial Comm. Init
  	 * Only `ready == true` interface is initialized
 	 **************************************************/
+	Status = CFE_SRL_InitCSP();
+	if (Status != CFE_SUCCESS) {
+		CFE_ES_WriteToSysLog("%s: CSP Initialization failed! RC=%d\n", __func__, Status);
+		return CFE_SUCCESS;
+	}
+	CFE_ES_WriteToSysLog("%s: CSP Successfully Initialized.\n", __func__);
+
 return CFE_SUCCESS;
 }

@@ -16,6 +16,10 @@
 #define CFE_RF_H
 
 
-void CFE_RF_CommandIngestInit(CFE_ES_TaskId_t *TaskIdPtr);
+int32 CFE_RF_CommandIngestInit(CFE_ES_TaskId_t *TaskIdPtr);
+
+inline int32 CFE_RF_TelemetryEmit(void *BufPtr, size_t Size, uint8_t Port) {
+    return CFE_SRL_ApiTransactionCSP(CSP_NODE_GS_KISS, Port, BufPtr, Size, NULL, 0);
+}
 
 #endif

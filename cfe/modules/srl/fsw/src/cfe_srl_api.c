@@ -111,7 +111,8 @@ int32 CFE_SRL_ApiGpioSet(CFE_SRL_GPIO_Handle_t *Handle, bool Value) {
 int32 CFE_SRL_ApiTransactionCSP(uint8_t Node, uint8_t Port, void *TxData, int TxSize, void *RxData, int RxSize) {
     int32 Status;
 
-    if (TxData == NULL || RxData == NULL) return CFE_SRL_BAD_ARGUMENT;
+    if (TxData == NULL) return CFE_SRL_BAD_ARGUMENT;
+    if (RxData == NULL && RxSize != 0) return CFE_SRL_BAD_ARGUMENT;
 
     Status = CFE_SRL_TransactionCSP(Node, Port, TxData, TxSize, RxData, RxSize);
     if (Status == CFE_SRL_TRANSACTION_ERR) return Status;
