@@ -190,7 +190,7 @@ int CFE_SRL_OpenSocket(CFE_SRL_IO_Handle_t *Handle, const char *DevName) {
  *  IO GPIO Function
  * 
  *************************************************************/
-int CFE_SRL_GpioInit(CFE_SRL_GPIO_Handle_t *Handle, const char *Path, unsigned int Line, const char *Name, bool Default) {
+int CFE_SRL_GpioInit(CFE_SRL_GPIO_Handle_t *Handle, const char *Path, unsigned int Line, const char *Name, bool Default, bool IsOut) {
     int Status;
     OS_printf("GPIO Handle address: %p\n",Handle);
     if (Handle == NULL || Path == NULL) return CFE_SRL_BAD_ARGUMENT;
@@ -201,7 +201,8 @@ int CFE_SRL_GpioInit(CFE_SRL_GPIO_Handle_t *Handle, const char *Path, unsigned i
     Status = CFE_SRL_BasicGpioGetLine(Handle, Line);
     if (Status != CFE_SUCCESS) return Status;
 
-    Status = CFE_SRL_BasicGpioSetOutput(Handle, Name, Default);
+    if (IsOut) Status = CFE_SRL_BasicGpioSetOutput(Handle, Name, Default);
+    else Status = CFE_SRL_BasicGpioSetInput(Handle, Name);
     if (Status != CFE_SUCCESS) return Status;
 
     return CFE_SUCCESS;

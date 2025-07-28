@@ -32,10 +32,24 @@ int32 CFE_SRL_EarlyInit(void) {
 	 * Serial Comm. Init
  	 * Only `ready == true` interface is initialized
 	 **************************************************/
+	/* GPIO ADCS_EN Init */
+	Status = CFE_SRL_GpioInit(&GPIO[CFE_SRL_ADCS_EN_GPIO_INDEXER], "/dev/gpiochip2", 3, "ADCS_EN", 0, false);
+	if (Status != CFE_SUCCESS) {
+		CFE_ES_WriteToSysLog("%s: GPIO ADCS_EN Initialization failed! RC=%d\n", __func__, Status);
+		return CFE_SRL_ADCS_EN_INIT_ERR;
+	}
+
+	/* GPIO STX_EN Init */
+	Status = CFE_SRL_GpioInit(&GPIO[CFE_SRL_STX_EN_GPIO_INDEXER], "/dev/gpiochip2", 3, "STX_EN", 0, true);
+	if (Status != CFE_SUCCESS) {
+		CFE_ES_WriteToSysLog("%s: GPIO STX_EN Initialization failed! RC=%d\n", __func__, Status);
+		return CFE_SRL_STX_EN_INIT_ERR;
+	}
+
 	Status = CFE_SRL_InitCSP();
 	if (Status != CFE_SUCCESS) {
 		CFE_ES_WriteToSysLog("%s: CSP Initialization failed! RC=%d\n", __func__, Status);
-		return CFE_SUCCESS;
+		return CFE_SRL_CSP_INIT_ERR;
 	}
 	CFE_ES_WriteToSysLog("%s: CSP Successfully Initialized.\n", __func__);
 

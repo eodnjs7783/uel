@@ -7,6 +7,8 @@
 /**
  * Early Init error define
  */
+#define CFE_SRL_ADCS_EN_INIT_ERR		CFE_SERIAL_ERROR(90)
+#define CFE_SRL_STX_EN_INIT_ERR		CFE_SERIAL_ERROR(91)
 
 
 #endif /* CFE_SRL_ERROR_H */

@@ -216,6 +216,17 @@ int32 CFE_SRL_BasicGpioSetOutput(CFE_SRL_GPIO_Handle_t *Handle, const char *Name
     return CFE_SUCCESS;
 }
 
+int32 CFE_SRL_BasicGpioSetInput(CFE_SRL_GPIO_Handle_t *Handle, const char *Name) {
+    int32 Status;
+
+    if (Handle == NULL) return CFE_SRL_BAD_ARGUMENT;
+
+    Status = gpiod_line_request_input(Handle->Line, Name);
+    if (Status < 0) return CFE_SRL_GPIO_SET_OUTPUT_ERR;
+
+    return CFE_SUCCESS;
+}
+
 int32 CFE_SRL_BasicGpioSetValue(CFE_SRL_GPIO_Handle_t *Handle, bool Value) {
     int32 Status;
 
@@ -225,6 +236,17 @@ int32 CFE_SRL_BasicGpioSetValue(CFE_SRL_GPIO_Handle_t *Handle, bool Value) {
     if (Status < 0) return CFE_SRL_GPIO_SET_VALUE_ERR;
 
     return CFE_SUCCESS;
+}
+
+int32 CFE_SRL_BasicGpioGetValue(CFE_SRL_GPIO_Handle_t *Handle) {
+    int32 Status;
+
+    if (Handle == NULL) return CFE_SRL_BAD_ARGUMENT;
+
+    Status = gpiod_line_get_value(Handle->Line);
+    if (Status < 0) return CFE_SRL_GPIO_SET_VALUE_ERR;
+
+    return Status;
 }
 
 int32 CFE_SRL_BasicGpioClose(CFE_SRL_GPIO_Handle_t *Handle) {
