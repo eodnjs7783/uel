@@ -296,6 +296,9 @@ int32 CFE_SRL_ReadUART(CFE_SRL_IO_Handle_t *Handle, const void *TxData, size_t T
     int Status;
     CFE_SRL_DevType_t DevType;
 
+    clock_t start, end;
+    double duration;
+
     if (Handle == NULL || RxData == NULL) return CFE_SRL_BAD_ARGUMENT;
 
     DevType = CFE_SRL_GetHandleDevType(Handle);
@@ -305,8 +308,9 @@ int32 CFE_SRL_ReadUART(CFE_SRL_IO_Handle_t *Handle, const void *TxData, size_t T
     Status = CFE_SRL_MutexLock(Handle);
     if (Status != CFE_SUCCESS) return Status;
 
-    if (TxData != NULL) {
+    if (TxData != NULL && TxSize > 0) {
         // Write
+        start = clock();
         Status = CFE_SRL_Write(Handle, TxData, TxSize);
         if (Status != CFE_SUCCESS) goto error;
 
@@ -316,12 +320,15 @@ int32 CFE_SRL_ReadUART(CFE_SRL_IO_Handle_t *Handle, const void *TxData, size_t T
 
     // Poll Read
     Status = CFE_SRL_Read(Handle, RxData, RxSize, Timeout, Read);
+    end =  clock();
     if (Status != CFE_SUCCESS) goto error;
 
     // Mutex Unlock
     Status = CFE_SRL_MutexUnlock(Handle);
     if (Status != CFE_SUCCESS) goto error;
 
+    duration = (double)(end- start)/CLOCKS_PER_SEC;
+    OS_printf("duration : %lf\n", duration);
     return CFE_SUCCESS;
 
 error:
@@ -353,7 +360,7 @@ int32 CFE_SRL_ReadCAN(CFE_SRL_IO_Handle_t *Handle, const void *TxData, size_t Tx
     Status = CFE_SRL_MutexLock(Handle);
     if (Status != CFE_SUCCESS) return Status;
 
-    if (TxData != NULL) {
+    if (TxData != NULL && TxSize > 0) {
         // Write
         Status = CFE_SRL_WriteCAN(Handle, TxData, TxSize, Addr);
         if (Status != CFE_SUCCESS) return Status;

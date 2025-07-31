@@ -34,7 +34,7 @@
         },
         {
             "type": "gpio", 
-            "ready": true, 
+            "ready": false, 
             "name":"ADCS_EN",
             "DevName": "/dev/gpiochip2",
             "line": 3,
@@ -43,7 +43,7 @@
         },
         {
             "type": "gpio", 
-            "ready": true, 
+            "ready": false, 
             "name":"STX_EN",
             "DevName": "/dev/gpiochip2",
             "line": 3,
@@ -52,9 +52,9 @@
         },
         {
             "type": "uart",
-            "ready": false,
+            "ready": true,
             "name": "socat",
-            "DevName": "/dev/pts/5",
+            "DevName": "/dev/pts/4",
             "baudrate": 115200
         },
         {
