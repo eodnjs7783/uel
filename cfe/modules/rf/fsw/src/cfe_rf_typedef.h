@@ -34,10 +34,11 @@ typedef enum {
  *************************************/
 typedef enum {
     
-    CFE_RF_DPORT_RPT = 13,
-    CFE_RF_DPORT_BCN = 31,
+    CFE_RF_DPORT_TRX = 13,
     CFE_RF_DPORT_FTP = 14,
-
+    CFE_RF_DPORT_RPT = 25,
+    CFE_RF_DPORT_BCN = 31,
+    
 } CFE_RF_Downlink_Port_t;
 
 #endif /* CFE_RF_TYPEDEF_H */
