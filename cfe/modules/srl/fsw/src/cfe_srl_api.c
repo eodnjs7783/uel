@@ -80,7 +80,7 @@ int32 CFE_SRL_ApiClose(CFE_SRL_IO_Handle_t *Handle) {
 
     if (Handle == NULL) return CFE_SRL_BAD_ARGUMENT;
 
-    Status = CFE_SRL_HandleClose(Handle);
+    Status = CFE_SRL_HandleClose(&Handle);
     if (Status != CFE_SUCCESS) return Status;
 
     return CFE_SUCCESS;

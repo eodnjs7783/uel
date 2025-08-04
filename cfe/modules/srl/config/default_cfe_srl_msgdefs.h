@@ -56,6 +56,8 @@ typedef struct CFE_SRL_HandleInitCmd_Payload {
      */
     uint8_t DevType;
 
+    uint8_t Padding[3];
+
     /**
      * Only need UART series init
      */
@@ -65,6 +67,8 @@ typedef struct CFE_SRL_HandleInitCmd_Payload {
      * Only need SPI init
      */
     uint8_t SPIMode;
+
+    uint8_t Padding2[3];
     
 } CFE_SRL_HandleInitCmd_Payload_t;
 

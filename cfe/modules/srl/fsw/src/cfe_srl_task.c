@@ -226,7 +226,8 @@ int32 CFE_SRL_InitHandleCmd(const CFE_SRL_InitHandleCmd_t *Cmd) {
 
 int32 CFE_SRL_CloseHandleCmd(const CFE_SRL_CloseHandleCmd_t *Cmd) {
     int32 Status;
-    Status = CFE_SRL_HandleClose(CFE_SRL_ApiGetHandle(Cmd->Payload.Indexer));
+
+    Status = CFE_SRL_HandleClose(&Handles[Cmd->Payload.Indexer]);
     
     if(Status == CFE_SUCCESS) {
         CFE_EVS_SendEvent(CFE_SRL_CLOSE_HANDLE_INF_EID, CFE_EVS_EventType_INFORMATION, "SRL Close Handle Cmd Success.");

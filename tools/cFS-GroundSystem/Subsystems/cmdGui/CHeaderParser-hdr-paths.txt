@@ -25,7 +25,9 @@
 #../../../../apps/sc/config/default_sc_msg.h
 #../../../../apps/sc/config/default_sc_msgdefs.h
 #../../../../apps/sc/config/default_sc_msgstruct.h
-../../../../apps/rpt/config/default_rpt_fcncodes.h
-../../../../apps/rpt/config/default_rpt_msg.h
-../../../../apps/rpt/config/default_rpt_msgdefs.h
-../../../../apps/rpt/config/default_rpt_msgstruct.h
+#../../../../apps/rpt/config/default_rpt_fcncodes.h
+#../../../../apps/rpt/config/default_rpt_msg.h
+#../../../../apps/rpt/config/default_rpt_msgdefs.h
+#../../../../apps/rpt/config/default_rpt_msgstruct.h
+../../../../cfe/modules/srl/config/default_cfe_srl_fcncodes.h
+../../../../cfe/modules/srl/config/default_cfe_srl_msgdefs.h
