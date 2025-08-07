@@ -324,7 +324,8 @@ void TO_LAB_forward_telemetry(void)
                      ****************************/
                     CfeStatus = CFE_RF_TelemetryEmit((void *)NetBufPtr, NetBufSize, 13); /* Eliminate `const` attr */
                     if (CfeStatus != CFE_SUCCESS) {
-                        CFE_EVS_SendErr(TO_LAB_TLMOUTSTOP_ERR_EID, "%s: RF emit error.\n", __func__);
+                        CFE_EVS_SendErr(TO_LAB_TLMOUTSTOP_ERR_EID, "%s: RF emit error. RC=0x%08X\n", __func__, CfeStatus);
+                        CfeStatus = CFE_SUCCESS; // Forcing to loop
                     }
                 }
 
